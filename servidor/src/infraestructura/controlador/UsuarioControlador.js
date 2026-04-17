@@ -10,15 +10,19 @@ export const crear = (req, res) => {
     log('INFO', traceId, `UsuarioControlador: Iniciando creación de usuario`);
     log('DEBUG', traceId, `UsuarioControlador: Datos recibidos - ${JSON.stringify(req.body)}`);
     
+
     const resultado = usuarioUsesCase.crear(req.body, traceId);
-    
+    const adaptadorMysql = new usuarioSQL(req.body);
+    const casoUsuario = new UsuarioUsesCase(adaptadorMysql);
     log('SUCCESS', traceId, `UsuarioControlador: Usuario creado con id ${resultado.id}`);
     log('INFO', traceId, `UsuarioControlador: Enviando respuesta al cliente`);
     
-    res.json({
+    res.status(200).json({
         id: resultado.id,
         mensaje: resultado.mensaje,
         traceId,
         trazabilidad: resultado.trazabilidad
     });
+
+    //Un caso de uso tiene entidades
 };

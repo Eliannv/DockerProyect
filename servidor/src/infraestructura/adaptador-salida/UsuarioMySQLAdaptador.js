@@ -10,13 +10,12 @@ export default class UsuarioMySQLAdaptador extends UsuarioSalidaPuerto {
 
     guardar = (usuario) => {
         log('INFO', 'SIN_TRACE', `UsuarioSQL.guardar: Validando usuario ${usuario.nombre}`);
-        log('DEBUG', 'SIN_TRACE', `UsuarioSQL.guardar: Total de usuarios en BD: ${this.usuarios.size}`);
         log('SUCCESS', 'SIN_TRACE', `UsuarioSQL.guardar: Usuario ${usuario.nombre} guardado exitosamente`);
 
         return "se guardo con exito";
     }
 
-    actualizar = (id, usuario, traceId = 'SIN_TRACE') => {
+    /*actualizar = (id, usuario, traceId = 'SIN_TRACE') => {
         log('INFO', 'SIN_TRACE', `UsuarioSQL.actualizar: Buscando usuario ${id}`);
 
         if (this.usuarios.has(id)) {
@@ -32,5 +31,5 @@ export default class UsuarioMySQLAdaptador extends UsuarioSalidaPuerto {
 
     listar = () => {
         return Array.from(this.usuarios.values());
-    }
+    }*/
 }

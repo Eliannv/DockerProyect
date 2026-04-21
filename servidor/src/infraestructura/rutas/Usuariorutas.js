@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import { crear } from '../controlador/UsuarioControlador.js';
+import { crear } from '../controladores/UsuarioControlador.js';
 
 const router = Router();
 router.post('/crear', crear);

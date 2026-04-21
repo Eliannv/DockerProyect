@@ -1,14 +1,11 @@
 export default class UsuarioEntradaPort{
     crear(usuario){
-        throw new Error("No se implementó el método crear en UsuarioEntradaPort");
+        throw new Error("No se implemento el metodo crear")
     }
-    editar(id, usuario){
-        throw new Error("No se implementó el método editar en UsuarioEntradaPort");
-    }
-    eliminar(id){
-        throw new Error("No se implementó el método eliminar en UsuarioEntradaPort");
+    eliminar (id){
+        throw new Error("No se implemento el metodo eliminar")
     }
     listar(){
-        throw new Error("No se implementó el método listar en UsuarioEntradaPort");
+        throw new Error("No se implemento el metodo listar")
     }
 }

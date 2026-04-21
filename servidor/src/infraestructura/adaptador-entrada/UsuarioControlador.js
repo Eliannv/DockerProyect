@@ -1,7 +1,7 @@
 import { log } from '../utils/Logger.js';
-import UsuarioEntradaPort from '../../aplicacion/puertos/entrada/UsuarioEntradaPort.js';
+import UsuarioEntradaPort from '../../aplicacion/puertos/entrada/UsuarioEntradaPuerto.js';
 import UsuarioUsesCase from '../../aplicacion/uses-cases/UsuarioUsesCase.js';
-import UsuarioMySQLAdaptador from '../persistencia/UsuarioMySQLAdaptador.js';
+import UsuarioMySQLAdaptador from '../adaptador-salida/UsuarioMySQLAdaptador.js';
 
 class UsuarioControlador {
     constructor(usuarioEntradaPort) {

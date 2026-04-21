@@ -8,34 +8,25 @@ export default class UsuarioMySQLAdaptador extends UsuarioSalidaPuerto {
         log('DEBUG', 'INIT', `UsuarioSQL: Inicializado repositorio en memoria`);
     }
 
-    guardar = (usuario, traceId = 'SIN_TRACE') => {
-        log('INFO', traceId, `UsuarioSQL.guardar: Validando usuario ${usuario.nombre}`);
-
-        if (!usuario.nombre || !usuario.cedula) {
-            log('ERROR', traceId, `UsuarioSQL.guardar: Datos inválidos`);
-            return "Datos inválidos";
-        }
-
-        log('INFO', traceId, `UsuarioSQL.guardar: Insertando en base de datos con id ${usuario.id}`);
-        this.usuarios.set(usuario.id, { ...usuario });
-
-        log('DEBUG', traceId, `UsuarioSQL.guardar: Total de usuarios en BD: ${this.usuarios.size}`);
-        log('SUCCESS', traceId, `UsuarioSQL.guardar: Usuario ${usuario.nombre} guardado exitosamente`);
+    guardar = (usuario) => {
+        log('INFO', 'SIN_TRACE', `UsuarioSQL.guardar: Validando usuario ${usuario.nombre}`);
+        log('DEBUG', 'SIN_TRACE', `UsuarioSQL.guardar: Total de usuarios en BD: ${this.usuarios.size}`);
+        log('SUCCESS', 'SIN_TRACE', `UsuarioSQL.guardar: Usuario ${usuario.nombre} guardado exitosamente`);
 
         return "se guardo con exito";
     }
 
     actualizar = (id, usuario, traceId = 'SIN_TRACE') => {
-        log('INFO', traceId, `UsuarioSQL.actualizar: Buscando usuario ${id}`);
+        log('INFO', 'SIN_TRACE', `UsuarioSQL.actualizar: Buscando usuario ${id}`);
 
         if (this.usuarios.has(id)) {
-            log('INFO', traceId, `UsuarioSQL.actualizar: Usuario encontrado, actualizando`);
+            log('INFO', 'SIN_TRACE', `UsuarioSQL.actualizar: Usuario encontrado, actualizando`);
             this.usuarios.set(id, { id, ...usuario });
-            log('SUCCESS', traceId, `UsuarioSQL.actualizar: Usuario ${id} actualizado`);
+            log('SUCCESS', 'SIN_TRACE', `UsuarioSQL.actualizar: Usuario ${id} actualizado`);
             return "se actualizo con exito";
         }
 
-        log('ERROR', traceId, `UsuarioSQL.actualizar: Usuario ${id} no encontrado`);
+        log('ERROR', 'SIN_TRACE', `UsuarioSQL.actualizar: Usuario ${id} no encontrado`);
         return "Usuario no encontrado";
     }
 

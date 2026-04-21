@@ -4,7 +4,7 @@ import cors from 'cors';
 import { traceMiddleware } from './infraestructura/middleware/TraceMiddleware.js';
 import { timeMiddleware } from './infraestructura/middleware/TimeMiddleware.js';
 import { loggerMiddleware } from './infraestructura/middleware/LoggerMiddleware.js';
-import usuarioRutas from './infraestructura/rutas/UsuarioRutas.js';
+import usuarioRutas from './infraestructura/rutas/ModuloUsuarioRutas.js';
 
 const app = express();
 app.use(cors());

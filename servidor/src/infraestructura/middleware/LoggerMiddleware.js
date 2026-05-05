@@ -1,7 +1,5 @@
-import {log} from '../utils/Logger.js';
-
-export const loggerMiddleware = (req, res, next) => {
-    const traceId = req.traceId;
-    log('INFO', traceId, `LoggerMiddleware: Solicitud ${req.method} ${req.originalUrl}`);
-    next();
-};
+export const loggerMiddleware = (req, res, next)=>{
+   console.log ("Se autentico "+ req.traceId +" metodo:"+ req.method + " url :" +req.url);
+   //console.log (`Se autentico ${req.traceId} metodo: ${req.method} url: ${req.url}`)
+   next();
+}

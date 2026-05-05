@@ -1,11 +1,5 @@
-export default class UsuarioEntradaPort{
-    crear(usuario){
-        throw new Error("No se implemento el metodo crear")
-    }
-    eliminar (id){
-        throw new Error("No se implemento el metodo eliminar")
-    }
-    listar(){
-        throw new Error("No se implemento el metodo listar")
+export default class UsuarioEntradaPuerto{
+    crear(req, resp){
+        throw new console.error("No se implemento el metodo crear")
     }
 }

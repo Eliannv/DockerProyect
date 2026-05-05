@@ -1,10 +1,8 @@
 import {randomUUID} from 'crypto';
-import {log} from '../utils/Logger.js';
-
-export const traceMiddleware = (req, res, next) => {
-    const traceId = randomUUID().substring(0, 8).toUpperCase();
+export const traceMiddleWare = (req, res, next)=>{
+    const traceId = randomUUID();
     req.traceId = traceId;
-    res.setHeader('X-Trace-Id', traceId);
-    log('START', traceId, `TraceMiddleware: Iniciando ${req.method} ${req.originalUrl}`);
+    res.setHeader("X-trace-Id",traceId);
+    console.log("El ID asignado:"+traceId)
     next();
-};
+}

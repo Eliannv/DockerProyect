@@ -1,7 +1,8 @@
 import {Router} from 'express';
-import { UsuarioControlador } from '../adaptador-entrada/UsuarioControlador.js';
+import {UsuarioControlador} from '../adaptador-entrada/UsuarioControlador.js';
 
 const router = Router();
-const usuarioControlador = new UsuarioControlador();
+const usuarioControlador =  new UsuarioControlador();
 router.post('/crear', usuarioControlador.crear);
+
 export default router;

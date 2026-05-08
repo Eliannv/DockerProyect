@@ -1,5 +1,7 @@
-export default class UsuarioEntradaPuerto{
-    crear(req, resp){
-        throw new console.error("No se implemento el metodo crear")
+export default class UsuarioEntradaPuerto {
+    async crear(req, res) {
+        throw new Error("No se implemento el metodo crear")
     }
+    
+   
 }

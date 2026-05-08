@@ -3,5 +3,4 @@ export default class Usuario{
     this.id = id;
     this.nombre = nombre;
    } 
-   
 }

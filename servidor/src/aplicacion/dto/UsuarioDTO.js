@@ -1,9 +1,22 @@
-export class UsuarioDTO {
-    constructor(infor) { //lo unico que se puede hacer aqui es validacion de atributos, nada mas, no se pueden hacer procesos de negocio
-        this.nombre = infor.nombre;
-        this.contrasena = infor.contrasena;
+export class usuarioDTO {
+    constructor(infor) {
+        this._nombre = infor.nombre;
+        this._contraseña = infor.contraseña;
     }
-    getNombres = async () => {
-        return this.nombre;
+
+    getNombre() {
+        return this._nombre;
+    }
+
+    setNombre(nombre) {
+        this._nombre = nombre;
+    }
+
+    getContraseña() {
+        return this._contraseña;
+    }
+
+    setContraseña(contraseña) {
+        this._contraseña = contraseña;
     }
 }

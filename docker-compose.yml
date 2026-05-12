@@ -18,3 +18,22 @@ services:
       - /app/node_modules
     depends_on:
       - servidor
+
+  postgres:
+    image: postgres:17
+
+    container_name: postgres-desarollo
+
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: arquitecturahexagonal
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:

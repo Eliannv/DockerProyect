@@ -2,7 +2,7 @@ import UsuarioMySQLCommondAdaptador from "../adaptador-salida/command/UsuarioMyS
 import UsuarioMySQLQueryAdaptador from "../adaptador-salida/query/UsuarioMySQLQueryAdaptador";
 
 const usuarioCommandPgsBDSalida = new UsuarioMySQLCommondAdaptador();
-const usuarioQueryPgsBDSalida = new UsuarioMySQLQueryAdaptador
+const usuarioQueryPgsBDSalida = new UsuarioMySQLQueryAdaptador();
 
 const casoUsoCommandUsuario = new UCommandCaso(usuarioCommandPgsBDSalida)
 const casoUsoQueryUsuario = new UQueryCaso(usuarioQueryPgsBDSalida)

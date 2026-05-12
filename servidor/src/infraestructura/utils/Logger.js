@@ -3,4 +3,4 @@ export const log = (level, traceId, message) => {
     console.log(`[${timestamp}] [${level}] [${traceId}] ${message}`);
     //Ejemplo de salida:
     // [2024-06-01T12:00:00.000Z] [INFO] [12345] Usuario creado exitosamente
-};
+}

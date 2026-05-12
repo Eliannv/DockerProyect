@@ -1,4 +1,4 @@
-import UsuarioEntradaQueryPuerto from '../../../aplicacion/puertos/entrada/UsuarioEntradaQueryPuerto.js';
+import UsuarioEntradaQueryPuerto from '../../../aplicacion/puertos/entrada/Query/UsuarioEntradaQueryPuerto.js';
 import UsuarioMySQLQueryAdaptador from '../../adaptador-salida/Query/UsuarioMySQLQueryAdaptador.js';
 import UsuarioQueryUsesCase from '../../../aplicacion/uses-cases/Query/UsuarioQueryUsesCase.js';
 

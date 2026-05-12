@@ -1,15 +1,15 @@
-import UsuarioEntradaPort from '../../aplicacion/puertos/entrada/Command/UsuarioEntradaCommandPuerto.js';
-import UsuarioMySQLCommondAdaptador from '../adaptador-salida/Command/UsuarioMySQLCommandAdaptador.js';
-import UsuarioUsesCase from '../../aplicacion/uses-cases/Command/UsuarioCommandUsesCase.js';
-import { usuarioDTO } from '../../aplicacion/dto/UsuarioDTO.js';
+import UsuarioEntradaPort from '../../../aplicacion/puertos/entrada/Command/UsuarioEntradaCommandPuerto.js';
+import UsuarioMySQLCommondAdaptador from '../../adaptador-salida/Command/UsuarioMySQLCommandAdaptador.js';
+import UsuarioUsesCase from '../../../aplicacion/uses-cases/Command/UsuarioCommandUsesCase.js';
+import { usuarioDTO } from '../../../aplicacion/dto/UsuarioDTO.js';
 import {Buffer} from 'buffer';
 import { buffer } from 'stream/consumers';
 
 class UsuarioController extends UsuarioEntradaPort {
-    constructor() {
+    constructor(casoUsoCommand, CasoUsoQuery) {
         super();
-        this.adaptador = new UsuarioMySQLCommondAdaptador();
-        this.casoUsuario = new UsuarioUsesCase(this.adaptador);
+        this.casoUsoCommandUsuario = casoUsoCommand
+        this.casoUsoQueryUsuario = CasoUsoQuery;
     }
 
     async crear(req, res) {
@@ -19,13 +19,14 @@ class UsuarioController extends UsuarioEntradaPort {
 
         try {
             const dtoUsu = new usuarioDTO(datos);
-            const resultado = await this.casoUsuario.crear(dtoUsu);
-            tamanoJSON = Buffer.byteLength(JSON.stringify(resultado));
+            const resultado = await this.casoUsoCommandUsuario.crear(dtoUsu);
+            const tamanoJSON = Buffer.byteLength(JSON.stringify(resultado));
 
             const resultBinario = Buffer.from(JSON.stringify(resultado));
             const tBinario = Buffer.byteLength(resultBinario);
-            
+
             const compresion = zlib.gzipSync(JSON.stringify(resultado));
+            const tamanoCompresion = Buffer.byteLength(compresion);
 
             res.status(200).json({
                 mensaje: 'Petición recibida correctamente',
@@ -34,7 +35,8 @@ class UsuarioController extends UsuarioEntradaPort {
                 tamanoJSON: tamanoJSON+ " bytes",
                 resultBinario: resultBinario,
                 tamanoBinario: tBinario+ " bytes ",
-                comprimir: compresion
+                comprimir: compresion,
+                tamanoCompresion: tamanoCompresion+ " bytes"
             });
         } catch (error) {
             console.error('Error en crear usuario:', error);

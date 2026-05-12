@@ -1,9 +1,9 @@
 import { Buffer } from 'buffer';
 import zlib from 'zlib';
 import { PersonaDTO } from '../../aplicacion/dto/PersonaDTO.js';
-import PersonaEntradaCommandPuerto from '../../aplicacion/puertos/entrada/PersonaEntradaCommandPuerto.js';
-import PersonaCommandUsesCase from '../../aplicacion/uses-cases/PersonaCommandUsesCase.js';
-import PersonaMySQLCommandAdaptador from '../adaptador-salida/PersonaMySQLCommandAdaptador.js';
+import PersonaEntradaCommandPuerto from '../../aplicacion/puertos/entrada/Command/PersonaEntradaCommandPuerto.js';
+import PersonaCommandUsesCase from '../../aplicacion/uses-cases/Command/PersonaCommandUsesCase.js';
+import PersonaMySQLCommandAdaptador from '../adaptador-salida/Command/PersonaMySQLCommandAdaptador.js';
 
 export default class PersonaCommandControlador extends PersonaEntradaCommandPuerto {
 

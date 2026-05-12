@@ -1,5 +1,5 @@
-import PersonaSalidaCommandPuerto from '../../aplicacion/puertos/salida/PersonaSalidaCommandPuerto.js';
-import { personaStore } from './PersonaStore.js';
+import PersonaSalidaCommandPuerto from '../../../aplicacion/puertos/salida/Command/PersonaSalidaCommandPuerto.js';
+import { personaStore } from '../PersonaStore.js';
 
 export default class PersonaMySQLCommandAdaptador extends PersonaSalidaCommandPuerto {
 

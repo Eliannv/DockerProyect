@@ -1,4 +1,4 @@
-import UsuarioSalidaCommondPuerto from "../../aplicacion/puertos/salida/UsuarioSalidaCommondPuerto.js";
+import UsuarioSalidaCommondPuerto from "../../../aplicacion/puertos/salida/Command/UsuarioSalidaCommandPuerto.js";
 
 export default class UsuarioMySQLCommondAdaptador extends UsuarioSalidaCommondPuerto {
     guardar = (usuario) => {

@@ -1,7 +1,9 @@
-import UsuarioEntradaPort from '../../aplicacion/puertos/entrada/UsuarioEntradaPuerto.js';
-import UsuarioMySQLCommondAdaptador from '../adaptador-salida/UsuarioMySQLCommondAdaptador.js';
-import UsuarioUsesCase from '../../aplicacion/uses-cases/UsuarioUsesCase.js';
+import UsuarioEntradaPort from '../../aplicacion/puertos/entrada/Command/UsuarioEntradaCommandPuerto.js';
+import UsuarioMySQLCommondAdaptador from '../adaptador-salida/Command/UsuarioMySQLCommandAdaptador.js';
+import UsuarioUsesCase from '../../aplicacion/uses-cases/Command/UsuarioCommandUsesCase.js';
 import { usuarioDTO } from '../../aplicacion/dto/UsuarioDTO.js';
+import {Buffer} from 'buffer';
+import { buffer } from 'stream/consumers';
 
 class UsuarioController extends UsuarioEntradaPort {
     constructor() {
@@ -18,10 +20,21 @@ class UsuarioController extends UsuarioEntradaPort {
         try {
             const dtoUsu = new usuarioDTO(datos);
             const resultado = await this.casoUsuario.crear(dtoUsu);
+            tamanoJSON = Buffer.byteLength(JSON.stringify(resultado));
+
+            const resultBinario = Buffer.from(JSON.stringify(resultado));
+            const tBinario = Buffer.byteLength(resultBinario);
+            
+            const compresion = zlib.gzipSync(JSON.stringify(resultado));
+
             res.status(200).json({
                 mensaje: 'Petición recibida correctamente',
                 traceId: idRequest,
-                resultado,
+                resultadoJSON: resultado,
+                tamanoJSON: tamanoJSON+ " bytes",
+                resultBinario: resultBinario,
+                tamanoBinario: tBinario+ " bytes ",
+                comprimir: compresion
             });
         } catch (error) {
             console.error('Error en crear usuario:', error);
@@ -29,6 +42,7 @@ class UsuarioController extends UsuarioEntradaPort {
                 mensaje: 'Error interno al crear usuario',
                 error: error.message,
                 traceId: idRequest,
+                
             });
         }
     }

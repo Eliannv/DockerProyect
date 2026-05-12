@@ -1,4 +1,4 @@
-import UsuarioSalidaQueryPuerto from "../../aplicacion/puertos/salida/UsuarioSalidaQueryPuerto.js";
+import UsuarioSalidaQueryPuerto from "../../../aplicacion/puertos/salida/Query/UsuarioSalidaQueryPuerto.js";
 
 export default class UsuarioMySQLQueryAdaptador extends UsuarioSalidaQueryPuerto {
     // Array estático simulando una base de datos

@@ -1,8 +1,8 @@
 import { Buffer } from 'buffer';
 import zlib from 'zlib';
-import PersonaEntradaQueryPuerto from '../../aplicacion/puertos/entrada/PersonaEntradaQueryPuerto.js';
-import PersonaQueryUsesCase from '../../aplicacion/uses-cases/PersonaQueryUsesCase.js';
-import PersonaMySQLQueryAdaptador from '../adaptador-salida/PersonaMySQLQueryAdaptador.js';
+import PersonaEntradaQueryPuerto from '../../../aplicacion/puertos/entrada/Query/PersonaEntradaQueryPuerto.js';
+import PersonaQueryUsesCase from '../../../aplicacion/uses-cases/Query/PersonaQueryUsesCase.js';
+import PersonaMySQLQueryAdaptador from '../../adaptador-salida/Query/PersonaMySQLQueryAdaptador.js';
 
 export default class PersonaQueryControlador extends PersonaEntradaQueryPuerto {
 

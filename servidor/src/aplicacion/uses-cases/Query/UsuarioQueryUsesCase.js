@@ -1,5 +1,5 @@
-import { NombreDTO } from "../dto/NombreDTO.js";
-import UsuarioEntradaQueryPuerto from "../puertos/entrada/UsuarioEntradaQueryPuerto.js";
+import { NombreDTO } from "../../dto/NombreDTO.js";
+import UsuarioEntradaQueryPuerto from "../../puertos/entrada/UsuarioEntradaQueryPuerto.js";
 
 export default class UsuarioQueryUsesCase extends UsuarioEntradaQueryPuerto {
     constructor(UsuarioMySQLQueryAdaptador) {
@@ -31,3 +31,4 @@ export default class UsuarioQueryUsesCase extends UsuarioEntradaQueryPuerto {
         return nombreDTOs;
     }
 }
+

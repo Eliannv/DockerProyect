@@ -1,4 +1,4 @@
-import PersonaEntradaQueryPuerto from '../puertos/entrada/PersonaEntradaQueryPuerto.js';
+import PersonaEntradaQueryPuerto from '../../puertos/entrada/Query/PersonaEntradaQueryPuerto.js';
 
 // Caso de uso de lectura — depende del puerto de salida (inyección de dependencias)
 export default class PersonaQueryUsesCase extends PersonaEntradaQueryPuerto {
@@ -14,3 +14,5 @@ export default class PersonaQueryUsesCase extends PersonaEntradaQueryPuerto {
         return await this.#adaptadorSalida.listar();
     }
 }
+
+

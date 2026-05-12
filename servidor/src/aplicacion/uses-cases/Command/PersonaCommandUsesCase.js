@@ -1,5 +1,5 @@
-import PersonaEntradaCommandPuerto from '../puertos/entrada/PersonaEntradaCommandPuerto.js';
-import Persona from '../../dominio/entidades/Persona.js';
+import PersonaEntradaCommandPuerto from '../../puertos/entrada/Command/PersonaEntradaCommandPuerto.js';
+import Persona from '../../../dominio/entidades/Persona.js';
 
 // Caso de uso de escritura — depende del puerto de salida (inyección de dependencias)
 export default class PersonaCommandUsesCase extends PersonaEntradaCommandPuerto {

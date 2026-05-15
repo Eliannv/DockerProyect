@@ -1,32 +1,25 @@
 import UsuarioSalidaQueryPuerto from "../../../aplicacion/puertos/salida/Query/UsuarioSalidaQueryPuerto.js";
+import postgresql from "../../base-dato/Postgresql.js";
 
 export default class UsuarioMySQLQueryAdaptador extends UsuarioSalidaQueryPuerto {
-    // Array estático simulando una base de datos
-    static NOMBRES = ["Ana García", "Juan Pérez", "María López", "Carlos Rodríguez", "Laura Martínez"];
-
     async obtenerNombre(indice) {
-        console.log('Ejecutando query simulado para obtener nombre en índice:', indice);
+        const resultado = await postgresql.query(
+            'SELECT id AS indice, nombre FROM public.usuario ORDER BY id OFFSET $1 LIMIT 1',
+            [indice]
+        );
 
-        // Simular consulta a BD
-        const nombre = UsuarioMySQLQueryAdaptador.NOMBRES[indice];
-
-        if (!nombre) {
-            throw new Error("Nombre no encontrado en el índice " + indice);
+        if (resultado.rowCount === 0) {
+            throw new Error('Nombre no encontrado en el índice ' + indice);
         }
 
-        return {
-            indice: indice,
-            nombre: nombre
-        };
+        return resultado.rows[0];
     }
 
     async listarNombres() {
-        console.log('Ejecutando query simulado para obtener todos los nombres');
+        const resultado = await postgresql.query(
+            'SELECT id AS indice, nombre FROM public.usuario ORDER BY id'
+        );
 
-        // Simular consulta a BD que retorna todos los registros
-        return UsuarioMySQLQueryAdaptador.NOMBRES.map((nombre, indice) => ({
-            indice: indice,
-            nombre: nombre
-        }));
+        return resultado.rows;
     }
 }

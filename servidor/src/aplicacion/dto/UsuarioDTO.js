@@ -1,22 +1,12 @@
-export class usuarioDTO {
-    constructor(infor) {
-        this._nombre = infor.nombre;
-        this._contraseña = infor.contraseña;
+export class UsuarioDTO{
+    constructor(infor){
+        this.nombre = infor.nombre;
+        this.cedula = infor.cedula;
+    }   
+    getNombre(){
+        return this.nombre;
     }
-
-    getNombre() {
-        return this._nombre;
-    }
-
-    setNombre(nombre) {
-        this._nombre = nombre;
-    }
-
-    getContraseña() {
-        return this._contraseña;
-    }
-
-    setContraseña(contraseña) {
-        this._contraseña = contraseña;
+    getCedula(){
+        return this.cedula;
     }
 }

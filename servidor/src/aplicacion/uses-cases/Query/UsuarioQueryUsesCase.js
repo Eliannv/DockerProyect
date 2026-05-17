@@ -1,34 +1,20 @@
-import { NombreDTO } from "../../dto/NombreDTO.js";
-import UsuarioEntradaQueryPuerto from "../../puertos/entrada/UsuarioEntradaQueryPuerto.js";
+import Usuario from "../../../dominio/entidades/Usuario.js"
 
-export default class UsuarioQueryUsesCase extends UsuarioEntradaQueryPuerto {
-    constructor(UsuarioMySQLQueryAdaptador) {
-        super();
-        this.UsuarioMySQLQueryAdaptador = UsuarioMySQLQueryAdaptador;
+export default class UsuarioQueryUsesCase {
+
+    constructor(adaptadorBDQuery) {
+        this.adaptadorBDQuery = adaptadorBDQuery;
     }
 
-    async obtenerNombre(indice) {
-        console.log('Ingreso al caso de uso obtenerNombre con índice:', indice);
-
-        // Obtener datos del adaptador de salida
-        const datos = await this.UsuarioMySQLQueryAdaptador.obtenerNombre(indice);
-
-        // Crear DTO de salida
-        const nombreDTO = new NombreDTO(datos.indice, datos.nombre);
-
-        return nombreDTO;
+    async listar() {
+        console.log('Ingreso al caso de uso de listar todos');
+        const result = await this.adaptadorBDQuery.listar();
+        return result;
     }
 
-    async listarNombres() {
-        console.log('Ingreso al caso de uso listarNombres');
-
-        // Obtener datos del adaptador de salida
-        const datos = await this.UsuarioMySQLQueryAdaptador.listarNombres();
-
-        // Crear DTOs de salida
-        const nombreDTOs = datos.map(item => new NombreDTO(item.indice, item.nombre));
-
-        return nombreDTOs;
+    async listarById(id) {
+        console.log(`Ingreso al caso de uso de listar por id: ${id}`);
+        const result = await this.adaptadorBDQuery.listarById(id);
+        return result;
     }
 }
-

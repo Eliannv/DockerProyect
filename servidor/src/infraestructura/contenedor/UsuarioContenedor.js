@@ -1,12 +1,15 @@
-import UsuarioMySQLCommondAdaptador from "../adaptador-salida/command/UsuarioMySQLCommondAdaptador";
-import UsuarioMySQLQueryAdaptador from "../adaptador-salida/query/UsuarioMySQLQueryAdaptador";
+import { UsuarioControlador } from "../adaptador-entrada/UsuarioControlador.js";
+import UsuarioMySQLCommandAdaptador from "../adaptador-salida/UsuarioPgsCommandAdaptador.js";
+import UsuarioMySQLQueryAdaptador from "../adaptador-salida/UsuarioPgsQueryAdaptador.js";
+import UsuarioCommandUsesCase from "../../aplicacion/uses-cases/command/UsuarioCommandUsesCase.js";
+import UsuarioQueryUsesCase from "../../aplicacion/uses-cases/query/UsuarioQueryUsesCase.js";
 
-const usuarioCommandPgsBDSalida = new UsuarioMySQLCommondAdaptador();
-const usuarioQueryPgsBDSalida = new UsuarioMySQLQueryAdaptador
+const usuarioCommandPgsBDSalida = new UsuarioMySQLCommandAdaptador();
+const usuarioQueryPgsBDSalida = new UsuarioMySQLQueryAdaptador();
 
-const casoUsoCommandUsuario = new UCommandCaso(usuarioCommandPgsBDSalida)
-const casoUsoQueryUsuario = new UQueryCaso(usuarioQueryPgsBDSalida)
+const casoUsoCommandUsuario = new UsuarioCommandUsesCase(usuarioCommandPgsBDSalida);
+const casoUsoQueryUsuario = new UsuarioQueryUsesCase(usuarioQueryPgsBDSalida);
 
-const usuarioControlador = new UsuarioControlador(casoUsoCommandUsuario, casoUsoQueryUsuario)
+const usuarioControlador = new UsuarioControlador(casoUsoCommandUsuario, casoUsoQueryUsuario);
 
-export {usuarioControlador};
+export { usuarioControlador };

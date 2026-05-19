@@ -4,7 +4,7 @@ import cors from 'cors'
 import { traceMiddleWare } from './infraestructura/middleware/TraceMiddleware.js';
 import { timeMiddleware } from './infraestructura/middleware/TimeMiddleware.js';
 import { loggerMiddleware } from './infraestructura/middleware/LoggerMiddleware.js';
-import  usuarioRutas from './infraestructura/rutas/moduloUsuarioRutas.js'
+import  usuarioRutas from './infraestructura/rutas/ModuloUsuarioRutas.js'
 import personaRutas from './infraestructura/rutas/personaRutas.js'
 
 //Librerias Core

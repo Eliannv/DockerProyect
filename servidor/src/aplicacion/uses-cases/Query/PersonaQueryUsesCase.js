@@ -14,5 +14,3 @@ export default class PersonaQueryUsesCase extends PersonaEntradaQueryPuerto {
         return await this.#adaptadorSalida.listar();
     }
 }
-
-

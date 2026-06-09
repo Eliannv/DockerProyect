@@ -5,31 +5,18 @@ export default class UsuarioMySQLCommandAdaptador extends usuarioSalidaCommandPu
     
     guardar = async (usuario) => {
         try {
-            const result = await postgresql.query(
-                'INSERT INTO public.usuario (nombre) VALUES ($1) RETURNING id',
-                [usuario.nombre]
-            );
-            const idGenerado = result.rows[0].id;
-            usuario.id = idGenerado;
-            console.log('Usuario guardado en PostgreSQL: ', usuario.nombre);
-            
-            return {
-                estado: "ok",
-                resultado: "Se guardó con éxito en la BD: " + usuario.nombre
-            };
+           ModeloUsuario.create({
+                nombre: usuario.getNombre()
+            },{transaccion});
+
+            (await transaction).commit();
             
         } catch (error) {
-            console.error('Error al guardar usuario:', error);
-            if (error.code === '23505') {
-                return {
-                    estado: "error",
-                    resultado: "El ID del usuario ya existe"
-                };
-            }
+            (await transaction).rollback();
             return {
                 estado: "error",
                 resultado: "Error al guardar en la BD: " + error.message
-            };
+            }
         }
     }
     actualizar = async (usuario) => {
@@ -95,5 +82,3 @@ export default class UsuarioMySQLCommandAdaptador extends usuarioSalidaCommandPu
         }
     }
 }
-
-export {sequelize};

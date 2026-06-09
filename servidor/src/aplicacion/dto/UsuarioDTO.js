@@ -1,22 +1,36 @@
+// aplicacion/dto/UsuarioDTO.js
 export class UsuarioDTO {
-    constructor(infor){
-        this.nombre = infor.nombre;
-        this.contrasena = infor.contrasena;
-        this.cedula = infor.cedula;
+    constructor(datos) {
+        this.id = datos.id || null;
+        this.nombre = datos.nombre || '';
     }
-
-    getNombre(){
-        return this.nombre
+    
+    getId() {
+        return this.id;
     }
-
-    getCedula(){
-        return this.cedula
+    
+    getNombre() {
+        return this.nombre;
     }
-
-    getNombres = async() =>{
-        return this.nombre
+    
+    setId(id) {
+        if (id && typeof id !== 'number' && isNaN(parseInt(id))) {
+            throw new Error('El ID debe ser un número válido');
+        }
+        this.id = id;
     }
-
+    
+    setNombre(nombre) {
+        if (!nombre || nombre.trim() === '') {
+            throw new Error('El nombre no puede estar vacío');
+        }
+        this.nombre = nombre.trim();
+    }
+    
+    validarId() {
+        if (!this.id) {
+            throw new Error('El ID es requerido');
+        }
+        return true;
+    }
 }
-
-export class usuarioDTO extends UsuarioDTO {}

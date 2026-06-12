@@ -6,25 +6,28 @@ const ModeloUsuario = sequelize.define('usuario', {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-        allowNull: false
+        field: "id",
     },
     nombre: {
         type: DataTypes.STRING(100),
-        allowNull: false
+        allowNull: false,
+        field: "nombre"
     },
-    delete_at: {
-        type: DataTypes.timestamps,
-        allowNull: true,
-        field: 'delete_at',
+    deleteat:{
+        type:DataTypes.DATE,
+        allowNull:true,
+        field:'deleteat'
     }
+
+
 }, {
     tableName: 'usuario',
-    timestamps: false,
+    timestamps: true, 
+    deletedAt: 'deleteat',
     schema: 'public',
     freezeTableName: true,
-    paranoid: true,
-    deletedAt: 'delete_at'
+    paranoid: true
 });
 
-export {sequelize};
+export{sequelize};
 export default ModeloUsuario;

@@ -19,15 +19,14 @@ export default configPgsql;
 import {Sequelize} from 'sequelize';
 
 const sequelize = new Sequelize(
-    "arquitecturahexagonal",
-    "postgres",
-    "admin",
+    process.env.DB_NAME || "arquitecturahexagonal",
+    process.env.DB_USER || "postgres",
+    process.env.DB_PASSWORD || "admin",
     {
-        host: "host.docker.internal",
-        port: 5432,
+        host: process.env.DB_HOST || "host.docker.internal",
+        port: Number(process.env.DB_PORT || 5432),
         dialect: "postgres",
         logging: console.log,
-
     }
 
 );

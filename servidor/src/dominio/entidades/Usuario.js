@@ -2,18 +2,21 @@ export default class Usuario{
    constructor(id,nombre){
     this.id = id;
     this.nombre = nombre;
-   } 
-
-   getId(){
-    return this.id;
    }
-   setId(id){
-    this.id = id;
+   
+   getId() {
+      return this.id;
    }
-   getNombre(){
-    return this.nombre;
+   
+   setId(id) {
+      this.id = id;
    }
-   setNombre(nombre){
-    this.nombre = nombre;
+   
+   getNombre() {
+      return this.nombre;
+   }
+   
+   setNombre(nombre) {
+      this.nombre = nombre;
    }
 }

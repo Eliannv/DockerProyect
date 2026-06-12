@@ -4,6 +4,7 @@ import cors from 'cors'
 import { traceMiddleWare } from './infraestructura/middleware/TraceMiddleware.js';
 import { timeMiddleware } from './infraestructura/middleware/TimeMiddleware.js';
 import { loggerMiddleware } from './infraestructura/middleware/LoggerMiddleware.js';
+import {sequelize} from './infraestructura/modelos/ModeloUsuario.js';
 import  usuarioRutas from './infraestructura/rutas/moduloUsuarioRutas.js'
 
 //Librerias Core
@@ -19,8 +20,16 @@ app.use(loggerMiddleware)
 // rutas 
 app.use('/api/usuario', usuarioRutas);
 
-//servidor
-app.listen(3000, () => {
-  console.log('Servidor corriendo en puerto 3000')
-}) 
+const iniciarServidor = async () => {
+  try {
+    await sequelize.sync();
+    app.listen(3000, () => {
+      console.log('Servidor corriendo en puerto 3000')
+    })
+  } catch (error) {
+    console.error('No se pudo inicializar la base de datos:', error);
+  }
+};
+
+iniciarServidor();
  

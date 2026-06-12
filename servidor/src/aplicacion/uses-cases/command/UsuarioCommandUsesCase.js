@@ -46,6 +46,12 @@ export default class UsuarioCommandUsesCase{
         }
         
         const result = await this.adaptadorBDSalida.eliminar(dtoUsuario.getId());
+        if (result.estado === "error") {
+            return {
+                estado: "error",
+                resultado: result.resultado
+            };
+        }
         console.log('Usuario eliminado exitosamente');
         return {
             estado: "ok",

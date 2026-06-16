@@ -12,8 +12,15 @@ export class UsuarioControlador extends UsuarioEntradaPort {
 
     crear = async (req,res)=>{
    
+    if (!req.is('application/json')) {
+        return res.status(415).json({
+            estado: 'error',
+            mensaje: 'El Content-Type debe ser application/json'
+        });
+    }
+
     const idRequest = req.traceId;
-    const datos =  req.body;
+    const datos = req.body;
 
     const dtoUsu= new UsuarioDTO(datos)
     
@@ -35,7 +42,10 @@ export class UsuarioControlador extends UsuarioEntradaPort {
         resultadoBinario: resultBinario,
         tamanoBinario: tBinario+ " bytes",
         comprimir: compresion,
-        tamanoCompresion: tamanoCompresion+ " bytes"
+        tamanoCompresion: tamanoCompresion+ " bytes",
+        enlaces: {
+            self: `/usuarios/${resultado}`,
+        }
     })
    }
    

@@ -1,167 +1,225 @@
 import usuarioSalidaCommandPuerto from "../../aplicacion/puertos/salida/UsuarioSalidaCommandPuerto.js";
-import ModeloUsuario, {sequelize} from '../modelos/ModeloUsuario.js';
+import ModeloUsuario, { sequelize } from '../modelos/ModeloUsuario.js';
 import { Transaction } from 'sequelize';
 import OutboxServicio from '../servicios/OutboxServicio.js';
 
-export default class UsuarioMySQLCommandAdaptador extends usuarioSalidaCommandPuerto {
-    
-    /*guardar = async (usuario) => {
+/**
+ * Adaptador PostgreSQL para operaciones de escritura (COMMAND) del Usuario
+ * Implementa la persistencia de datos en PostgreSQL usando Sequelize
+ * Utiliza transacciones para garantizar consistencia de datos
+ */
+export default class UsuarioPgsCommandAdaptador extends usuarioSalidaCommandPuerto {
+
+    /**
+     * Guardar un nuevo usuario en la base de datos
+     * @param {Usuario} usuario - Entidad Usuario a crear
+     * @returns {Object} Resultado con datos del usuario creado
+     */
+    guardar = async(usuario) => {
+        const nombre = usuario.getNombre();
+        const correo = usuario.getCorreo();
+        const estado = usuario.getEstado();
+
+        // Validaciones básicas
+        if (nombre === "") {
+            throw new Error("El nombre del usuario no puede estar vacío");
+        }
+
+        if (!correo || correo === "") {
+            throw new Error("El correo del usuario no puede estar vacío");
+        }
+
+        if (estado === "") {
+            throw new Error("El estado del usuario no puede estar vacío");
+        }
+
+        // Iniciar transacción con nivel de aislamiento READ_COMMITTED
+        const transaction = await sequelize.transaction({
+            isolationLevel: Transaction.ISOLATION_LEVELS.READ_COMMITTED
+        });
+
         try {
-            const result = await postgresql.query(
-                'INSERT INTO public.usuario (nombre) VALUES ($1) RETURNING id',
-                [usuario.nombre]
-            );
-            const idGenerado = result.rows[0].id;
-            usuario.id = idGenerado;
-            console.log('Usuario guardado en PostgreSQL: ', usuario.nombre);
-            
+            // Crear usuario en la base de datos
+            const usuarioCreado = await ModeloUsuario.create({
+                nombre: nombre,
+                correo: correo,
+                estado: estado
+            }, { transaction });
+
+            // Registrar evento en Outbox para procesamiento asíncrono
+            await OutboxServicio.registrarEvento({
+                tipoEvento: 'UsuarioCreado',
+                idAgregado: String(usuarioCreado.id),
+                contenido: {
+                    id: usuarioCreado.id,
+                    nombre: usuarioCreado.nombre,
+                    correo: usuarioCreado.correo,
+                    estado: usuarioCreado.estado
+                }
+            }, transaction);
+
+            await transaction.commit();
+            console.log('Usuario guardado en PostgreSQL:', usuarioCreado.nombre);
+
             return {
                 estado: "ok",
-                resultado: "Se guardó con éxito en la BD: " + usuario.nombre
+                usuario: {
+                    usu_id: usuarioCreado.id,
+                    usu_nombre: usuarioCreado.nombre,
+                    usu_correo: usuarioCreado.correo,
+                    usu_estado: usuarioCreado.estado
+                }
             };
-            
-        } catch (error) {
-            console.error('Error al guardar usuario:', error);
-            if (error.code === '23505') {
+        } catch (e) {
+            await transaction.rollback();
+            console.error('Error al guardar usuario:', e);
+
+            // Validar errores de base de datos específicos
+            if (e.name === 'SequelizeUniqueConstraintError') {
                 return {
                     estado: "error",
-                    resultado: "El ID del usuario ya existe"
+                    resultado: "El correo ya está registrado"
                 };
             }
+
             return {
                 estado: "error",
-                resultado: "Error al guardar en la BD: " + error.message
+                resultado: "Error al guardar en la BD: " + e.message
             };
         }
-    }*/
+    }
 
-        guardar = async (usuario) => {
-            const nombre = usuario.getNombre();
+    /**
+     * Actualizar datos de un usuario existente
+     * @param {number} id - ID del usuario a actualizar
+     * @param {Object} datosActualizacion - Campos a actualizar
+     * @returns {Object} Resultado con datos del usuario actualizado
+     */
+    actualizar = async(id, datosActualizacion) => {
+        const transaction = await sequelize.transaction({
+            isolationLevel: Transaction.ISOLATION_LEVELS.READ_COMMITTED
+        });
 
+        try {
+            // Buscar usuario existente
+            const usuario = await ModeloUsuario.findByPk(id, { transaction });
 
-            if(nombre === ""){
-                throw new Error("El nombre del usuario no puede estar vacío");
-            }
-
-            const transaction = await sequelize.transaction({
-                    isolationLevel: Transaction.ISOLATION_LEVELS.READ_COMMITTED
-            });
-            try {
-                const usuarioCreado = await ModeloUsuario.create({
-                    nombre: usuario.getNombre()
-                }, { transaction });
-
-                await OutboxServicio.registrarEvento({
-                    tipoEvento: 'UsuarioCreado',
-                    idAgregado: String(usuarioCreado.id),
-                    contenido: {
-                        id: usuarioCreado.id,
-                        nombre: usuarioCreado.nombre
-                    }
-                }, transaction);
-                
-                await transaction.commit();
-                console.log('Se guardo usando el adaptador SQL')
-                return {
-                    estado: "ok",
-                    resultado: "Se guardó con éxito en la BD: " + usuario.getNombre()
-                };
-            } catch (e) {
+            if (!usuario) {
                 await transaction.rollback();
                 return {
                     estado: "error",
-                    resultado: "Error al guardar en la BD: " + e.message
+                    errores: ["Usuario no encontrado"],
+                    codigo: "USUARIO_NO_ENCONTRADO"
                 };
             }
-        }
 
-        actualizar = async (usuario) => {
-            const id = usuario.getId();
-            const nombre = usuario.getNombre();
-
-            if (!id) {
-                throw new Error("El ID del usuario no puede estar vacío");
+            // Actualizar solo los campos proporcionados
+            if (datosActualizacion.nombre) {
+                usuario.nombre = datosActualizacion.nombre;
+            }
+            if (datosActualizacion.correo) {
+                usuario.correo = datosActualizacion.correo;
+            }
+            if (datosActualizacion.estado) {
+                usuario.estado = datosActualizacion.estado;
             }
 
-            if (!nombre) {
-                throw new Error("El nombre del usuario no puede estar vacío");
-            }
+            // Guardar cambios
+            await usuario.save({ transaction });
 
-            const transaction = await sequelize.transaction({
-                isolationLevel: Transaction.ISOLATION_LEVELS.READ_COMMITTED
-            });
-
-            try {
-                const usuarioExistente = await ModeloUsuario.findByPk(id, { transaction });
-                if (!usuarioExistente) {
-                    throw new Error(`No existe un usuario con ID ${id}`);
+            // Registrar evento en Outbox
+            await OutboxServicio.registrarEvento({
+                tipoEvento: 'UsuarioActualizado',
+                idAgregado: String(usuario.id),
+                contenido: {
+                    id: usuario.id,
+                    nombre: usuario.nombre,
+                    correo: usuario.correo,
+                    estado: usuario.estado
                 }
+            }, transaction);
 
-                usuarioExistente.nombre = nombre;
-                await usuarioExistente.save({ transaction });
+            await transaction.commit();
+            console.log('Usuario actualizado en PostgreSQL:', usuario.nombre);
 
-                await OutboxServicio.registrarEvento({
-                    tipoEvento: 'UsuarioActualizado',
-                    idAgregado: String(usuarioExistente.id),
-                    contenido: {
-                        id: usuarioExistente.id,
-                        nombre: usuarioExistente.nombre
-                    }
-                }, transaction);
+            return {
+                estado: "ok",
+                usuario: {
+                    usu_id: usuario.id,
+                    usu_nombre: usuario.nombre,
+                    usu_correo: usuario.correo,
+                    usu_estado: usuario.estado
+                }
+            };
+        } catch (e) {
+            await transaction.rollback();
+            console.error('Error al actualizar usuario:', e);
 
-                await transaction.commit();
-                console.log('Se actualizó usando el adaptador SQL');
+            if (e.name === 'SequelizeUniqueConstraintError') {
                 return {
-                    estado: "ok",
-                    resultado: `Usuario con ID ${id} actualizado a: ${nombre}`
+                    estado: "error",
+                    errores: ["El correo ya está registrado"],
+                    codigo: "CORREO_DUPLICADO"
                 };
-            } catch (e) {
+            }
+
+            return {
+                estado: "error",
+                errores: ["Error al actualizar en la BD: " + e.message],
+                codigo: "ERROR_BD"
+            };
+        }
+    }
+
+    /**
+     * Eliminar un usuario (soft delete - marca como eliminado)
+     * @param {number} id - ID del usuario a eliminar
+     * @returns {Object} Resultado de la operación
+     */
+    eliminar = async(id) => {
+        const transaction = await sequelize.transaction({
+            isolationLevel: Transaction.ISOLATION_LEVELS.READ_COMMITTED
+        });
+
+        try {
+            const usuario = await ModeloUsuario.findByPk(id, { transaction });
+
+            if (!usuario) {
                 await transaction.rollback();
                 return {
                     estado: "error",
-                    resultado: "Error al actualizar en la BD: " + e.message
+                    errores: ["Usuario no encontrado"],
+                    codigo: "USUARIO_NO_ENCONTRADO"
                 };
             }
-        }
 
-        eliminar = async (id) => {
-            const transaction = await sequelize.transaction({
-                    isolationLevel: Transaction.ISOLATION_LEVELS.READ_COMMITTED
-            });
+            // Soft delete: marca como eliminado sin borrar datos
+            await usuario.destroy({ transaction });
 
-            try {
-
-                if (!id) {
-                    throw new Error("El ID del usuario no puede estar vacío");
+            // Registrar evento en Outbox
+            await OutboxServicio.registrarEvento({
+                tipoEvento: 'UsuarioEliminado',
+                idAgregado: String(id),
+                contenido: {
+                    id: id,
+                    nombre: usuario.nombre
                 }
+            }, transaction);
 
-                const usuarioExistente = await ModeloUsuario.findByPk(id, { transaction });
-                if (!usuarioExistente) {
-                    throw new Error(`No existe un usuario con ID ${id}`);
-                }
+            await transaction.commit();
+            console.log('Usuario eliminado de PostgreSQL, ID:', id);
 
-                await OutboxServicio.registrarEvento({
-                    tipoEvento: 'UsuarioEliminado',
-                    idAgregado: String(usuarioExistente.id),
-                    contenido: {
-                        id: usuarioExistente.id,
-                        nombre: usuarioExistente.nombre
-                    }
-                }, transaction);
-
-                await usuarioExistente.destroy({ transaction });
-                await transaction.commit();
-                console.log('Se eliminó usando el adaptador SQL')
-                return {
-                    estado: "ok",
-                    resultado: "Se eliminó con éxito en la BD. ID: " + id
-                };
-            } catch (e) {
-                await transaction.rollback();
-                return {
-                    estado: "error",
-                    resultado: "Error al eliminar en la BD: " + e.message
-                };
-            }
+            return {
+                estado: "ok"
+            };
+        } catch (e) {
+            await transaction.rollback();
+            console.error('Error al eliminar usuario:', e);
+            return {
+                estado: "error",
+                errores: ["Error al eliminar en la BD: " + e.message],
+                codigo: "ERROR_BD"
+            };
         }
+    }
 }

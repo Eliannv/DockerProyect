@@ -1,11 +1,29 @@
 services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: arquitecturahexagonal
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   servidor:
     build: ./servidor
     container_name: servidor-desarrollo
     ports:
       - "3000:3000"
     environment:
-      DB_HOST: host.docker.internal
+      DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: arquitecturahexagonal
       DB_USER: postgres
@@ -13,8 +31,10 @@ services:
     volumes:
       - ./servidor:/app
       - /app/node_modules
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: node src/app.js
 
   cliente:
     build: ./cliente
@@ -27,13 +47,5 @@ services:
     depends_on:
       - servidor
 
-  mongo:
-    image: mongo:latest
-    container_name: mongo-db
-    restart: always
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
 volumes:
-  mongo_data:
+  postgres_data:

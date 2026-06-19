@@ -1,140 +1,146 @@
 import { UsuarioDTO } from '../../aplicacion/dto/UsuarioDTO.js';
 import UsuarioEntradaPort from "../../aplicacion/puertos/entrada/UsuarioEntradaPuerto.js"
-import {Buffer} from 'buffer'
-import zlib from 'zlib'
 
+/**
+ * Controlador HTTP para las operaciones del Usuario
+ * Maneja las solicitudes HTTP y traduce a casos de uso
+ */
 export class UsuarioControlador extends UsuarioEntradaPort {
-    constructor(casoUsoCommand, CasoUsoQuery){
+    constructor(casoUsoCommand, casoUsoQuery) {
         super();
         this.casoUsoCommandUsuario = casoUsoCommand;
-        this.casoUsoQueryUsuario = CasoUsoQuery;
+        this.casoUsoQueryUsuario = casoUsoQuery;
     }
 
-    crear = async (req,res)=>{
-   
-    if (!req.is('application/json')) {
-        return res.status(415).json({
-            estado: 'error',
-            mensaje: 'El Content-Type debe ser application/json'
-        });
-    }
+    /**
+     * POST /api/v1/usuarios - Crear un nuevo usuario
+     * @param {Request} req - Objeto request con datos en body
+     * @param {Response} res - Objeto response para enviar la respuesta
+     */
+    crear = async(req, res) => {
+        try {
+            if (!req.is('application/json')) {
+                return res.enviarError('CONTENT_TYPE_INVALIDO', 'El Content-Type debe ser application/json', [], 400);
+            }
 
-    const idRequest = req.traceId;
-    const datos = req.body;
+            const datos = req.body;
+            const dtoUsu = new UsuarioDTO(datos);
 
-    const dtoUsu= new UsuarioDTO(datos)
-    
-    console.log("Ingresamos al controlador con: " + idRequest + dtoUsu.getNombre());
+            const resultado = await this.casoUsoCommandUsuario.crear(dtoUsu);
 
-    const resultado = await this.casoUsoCommandUsuario.crear(dtoUsu);
-    const tJSON= Buffer.byteLength(JSON.stringify( resultado));
+            if (resultado.estado === 'error') {
+                return res.enviarError('VALIDACION_FALLIDA', 'Datos inválidos', resultado.errores, 400);
+            }
 
-    const resultBinario = Buffer.from(JSON.stringify(resultado));
-    const tBinario = Buffer.byteLength(resultBinario)
-
-    const compresion = zlib.gzipSync(JSON.stringify(resultado));
-    const tamanoCompresion = Buffer.byteLength(compresion)
-    res.status(200).json({
-        mensaje: 'Petición recibida correctamente',
-        traceId: idRequest,
-        resultadoJSON:  resultado,
-        tamanoJSON: tJSON+ " bytes",
-        resultadoBinario: resultBinario,
-        tamanoBinario: tBinario+ " bytes",
-        comprimir: compresion,
-        tamanoCompresion: tamanoCompresion+ " bytes",
-        enlaces: {
-            self: `/usuarios/${resultado}`,
+            return res.enviarExito(resultado.usuario, 'Usuario creado correctamente', 201);
+        } catch (error) {
+            console.error('Error al crear usuario:', error);
+            return res.enviarError('ERROR_INTERNO', error.message, [], 500);
         }
-    })
-   }
-   
-    lista = async(req,res)=>{
-        
-        const resultado  = await this.casoUsoQueryUsuario.lista();  
-        res.status(200).json({
-            estado: "ok",
-            resultado : resultado    
-        });
-    }
+    };
 
-    editar = async(req, res) => {
-        const idRequest = req.traceId;
-        const datos = req.body;
-        
-        const id = datos.id;
-        
-        if (!id) {
-            return res.status(400).json({
-                estado: "error",
-                mensaje: "El ID es requerido en el body para actualizar",
-                traceId: idRequest
-            });
+    /**
+     * GET /api/v1/usuarios - Listar todos los usuarios
+     * @param {Request} req - Objeto request
+     * @param {Response} res - Objeto response para enviar la respuesta
+     */
+    lista = async(req, res) => {
+        try {
+            const resultado = await this.casoUsoQueryUsuario.listar();
+
+            if (resultado.estado === 'error') {
+                return res.enviarError('ERROR_LISTADO', 'Error al listar usuarios', resultado.errores, 500);
+            }
+
+            return res.enviarExito(resultado.usuarios, 'Usuarios listados correctamente', 200);
+        } catch (error) {
+            console.error('Error al listar usuarios:', error);
+            return res.enviarError('ERROR_INTERNO', error.message, [], 500);
         }
-        
-        if (!datos.nombre) {
-            return res.status(400).json({
-                estado: "error",
-                mensaje: "El nombre es requerido en el body para actualizar",
-                traceId: idRequest
-            });
+    };
+
+    /**
+     * GET /api/v1/usuarios/:id - Obtener usuario por ID
+     * @param {Request} req - Objeto request con ID en params
+     * @param {Response} res - Objeto response para enviar la respuesta
+     */
+    obtenerPorId = async(req, res) => {
+        try {
+            const id = req.params.id;
+
+            const resultado = await this.casoUsoQueryUsuario.obtenerPorId(id);
+
+            if (resultado.estado === 'error') {
+                if (resultado.codigo === 'USUARIO_NO_ENCONTRADO') {
+                    return res.enviarError('USUARIO_NO_ENCONTRADO', 'Usuario no encontrado', [], 404);
+                }
+                return res.enviarError(resultado.codigo, resultado.errores[0], resultado.errores, 400);
+            }
+
+            return res.enviarExito(resultado.usuario, 'Usuario obtenido correctamente', 200);
+        } catch (error) {
+            console.error('Error al obtener usuario:', error);
+            return res.enviarError('ERROR_INTERNO', error.message, [], 500);
         }
-        
-        const dtoUsu = new UsuarioDTO({
-            id: id,
-            nombre: datos.nombre
-        });
-        
-        console.log(`Editando usuario ID ${id} con nombre: ${dtoUsu.getNombre()}`);
-        
-        const resultado = await this.casoUsoCommandUsuario.editar(dtoUsu);
-        
-        if (resultado.estado === "error") {
-            return res.status(404).json({
-                estado: "error",
-                mensaje: resultado.resultado,
-                traceId: idRequest
-            });
+    };
+
+    /**
+     * PATCH /api/v1/usuarios/:id - Actualizar usuario parcialmente
+     * @param {Request} req - Objeto request con ID en params y datos en body
+     * @param {Response} res - Objeto response para enviar la respuesta
+     */
+    actualizar = async(req, res) => {
+        try {
+            if (!req.is('application/json')) {
+                return res.enviarError('CONTENT_TYPE_INVALIDO', 'El Content-Type debe ser application/json', [], 400);
+            }
+
+            const id = req.params.id;
+            const datos = req.body;
+            const dtoUsu = new UsuarioDTO(datos);
+
+            const resultado = await this.casoUsoCommandUsuario.actualizar(id, dtoUsu);
+
+            if (resultado.estado === 'error') {
+                if (resultado.codigo === 'USUARIO_NO_ENCONTRADO') {
+                    return res.enviarError('USUARIO_NO_ENCONTRADO', 'Usuario no encontrado', [], 404);
+                }
+                return res.enviarError('VALIDACION_FALLIDA', 'Datos inválidos', resultado.errores, 400);
+            }
+
+            return res.enviarExito(resultado.usuario, 'Usuario actualizado correctamente', 200);
+        } catch (error) {
+            console.error('Error al actualizar usuario:', error);
+            return res.enviarError('ERROR_INTERNO', error.message, [], 500);
         }
-        
-        res.status(200).json({
-            estado: "ok",
-            mensaje: resultado.resultado,
-            traceId: idRequest
-        });
-    }
-    
+    };
+
+    /**
+     * DELETE /api/v1/usuarios/:id - Eliminar usuario (soft delete)
+     * @param {Request} req - Objeto request con ID en params
+     * @param {Response} res - Objeto response para enviar la respuesta
+     */
     eliminar = async(req, res) => {
-        const idRequest = req.traceId;
-        const datos = req.body;
-        
-        const id = datos.id;
-        
-        if (!id) {
-            return res.status(400).json({
-                estado: "error",
-                mensaje: "El ID es requerido en el body para eliminar",
-                traceId: idRequest
-            });
+        try {
+            const id = req.params.id;
+
+            if (!id || isNaN(parseInt(id))) {
+                return res.enviarError('ID_INVALIDO', 'El ID debe ser un número válido', [], 400);
+            }
+
+            const resultado = await this.casoUsoCommandUsuario.eliminar(id);
+
+            if (resultado.estado === 'error') {
+                if (resultado.codigo === 'USUARIO_NO_ENCONTRADO') {
+                    return res.enviarError('USUARIO_NO_ENCONTRADO', 'Usuario no encontrado', [], 404);
+                }
+                return res.enviarError('ERROR_ELIMINACION', resultado.errores[0], resultado.errores, 500);
+            }
+
+            return res.enviarVacio(204);
+        } catch (error) {
+            console.error('Error al eliminar usuario:', error);
+            return res.enviarError('ERROR_INTERNO', error.message, [], 500);
         }
-        
-        console.log(`Eliminando usuario con ID: ${id}`);
-        
-        const dtoUsu = new UsuarioDTO({ id: id });
-        const resultado = await this.casoUsoCommandUsuario.eliminar(dtoUsu);
-        
-        if (resultado.estado === "error") {
-            return res.status(404).json({
-                estado: "error",
-                mensaje: resultado.resultado,
-                traceId: idRequest
-            });
-        }
-        
-        res.status(200).json({
-            estado: "ok",
-            mensaje: resultado.resultado,
-            traceId: idRequest
-        });
-    }
-} 
+    };
+}

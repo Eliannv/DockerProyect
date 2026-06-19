@@ -9,6 +9,4 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
-
-RUN npm install -g nodemon
+CMD ["node", "src/app.js"]

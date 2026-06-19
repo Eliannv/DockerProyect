@@ -1,41 +1,25 @@
-/*import pkg from 'pg';
-const { Pool } = pkg;
-const configPgsql = new Pool({
-    host: 'host.docker.internal',
-    port: 5432,
-    user: 'postgres',
-    password: 'UTMACH',
-    database: 'arquitecturahexagonal',
-    max: 3
-});
-configPgsql.on('connect', () => {
-    console.log('Nueva Conexion Creada');
-});
+import { Sequelize } from 'sequelize';
 
-export default configPgsql;
-
-*/
-
-import {Sequelize} from 'sequelize';
-
+// Configuración de conexión a PostgreSQL
+// Utiliza variables de entorno si están disponibles, sino usa valores por defecto
 const sequelize = new Sequelize(
     process.env.DB_NAME || "arquitecturahexagonal",
     process.env.DB_USER || "postgres",
-    process.env.DB_PASSWORD || "admin",
-    {
-        host: process.env.DB_HOST || "host.docker.internal",
+    process.env.DB_PASSWORD || "admin", {
+        host: process.env.DB_HOST || "localhost",
         port: Number(process.env.DB_PORT || 5432),
         dialect: "postgres",
-        logging: console.log,
+        logging: false,
     }
-
 );
+
+// Verificar conexión a la base de datos
 sequelize.authenticate()
     .then(() => {
-        console.log('Conexión ORM a la base de datos establecida exitosamente.');
+        console.log('✓ Conexión a PostgreSQL establecida correctamente');
     })
     .catch((error) => {
-        console.error('No se pudo conectar a la base de datos:', error);
+        console.error('✗ Error de conexión a PostgreSQL:', error.message);
     });
 
 export default sequelize;
